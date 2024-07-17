@@ -1,9 +1,8 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <p>
+    Links aus der Liste ein Schiff auswählen oder ein neues Schiff anlegen!
+  </p>
 </template>

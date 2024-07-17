@@ -1,85 +1,101 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import {RouterView, useRoute} from 'vue-router';
+import {useShipStore} from "@/stores/ship.js";
+import router from "@/router/index.js";
+import {onMounted, provide, ref, watch} from "vue";
+
+import localforage from "localforage";
+
+const route = useRoute();
+
+const shipStore = useShipStore();
+const shipId = ref(null);
+provide('shipId', shipId);
+
+function createNewShip() {
+  let shipName = prompt('Name des Schiffs', 'Neues Schiff');
+  if (!shipName) {
+    shipName = 'Neues Schiff!';
+  }
+
+  const ship = {
+    id: Date.now(),
+    name: shipName,
+    modules: [
+      {
+        name: 'Hull',
+        armorClass: 15,
+        hitPoints: 100,
+        currentHitPoints: 100,
+        otherStats: [],
+        damageThreshold: 10,
+      },
+      {
+        name: 'Control: Helm',
+        armorClass: 12,
+        hitPoints: 50,
+        currentHitPoints: 50,
+        otherStats: [],
+        description: 'Move up to ...',
+      }
+    ]
+  }
+
+  shipStore.addShip(ship);
+  router.push('/ship/' + ship.id);
+}
+
+onMounted(() => {
+  if (route.params.shipId) {
+    shipId.value = route.params.shipId;
+  }
+});
+watch(
+    () => route.params.shipId,
+    newShipId => {
+      shipId.value = newShipId;
+    }
+)
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
+    <h1 style="cursor: pointer" @click="router.push('/')">
+      Saltmarsh Ship Editor
+    </h1>
   </header>
 
-  <RouterView />
+  <main id="main">
+    <div id="sidebar">
+      <div class="list">
+        <div>
+          <b>Schiffe:</b>
+        </div>
+        <a @click="createNewShip">
+          Neues Schiff erstellen
+        </a>
+        <hr>
+        <RouterLink :to="'/ship/' + ship.id" v-for="ship in shipStore.getShips()" :key="'ship_' + ship.id"
+                    active-class="active"
+        >
+          {{ ship.name }}
+        </RouterLink>
+      </div>
+    </div>
+    <div id="content">
+      <RouterView/>
+    </div>
+  </main>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.router-link-active {
+  font-weight: bold;
 }
 </style>
