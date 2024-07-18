@@ -18,7 +18,7 @@ function importShip(event) {
   reader.onload = (e) => {
     try {
       ship.value = JSON.parse(e.target.result);
-      ship.value.id = new Date();
+      ship.value.id = Date.now();
       console.log('parsed?');
     } catch (e) {
       error.value = e;

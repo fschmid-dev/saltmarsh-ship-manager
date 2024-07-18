@@ -37,7 +37,10 @@ defineProps({
         <div>
           <button
               v-for="delta in [-10, -5, -1, 1, 5, 10]" :key="'module_' + index + '_chp_' + delta"
-              @click="module.currentHitPoints += delta">
+              @click="module.currentHitPoints += delta"
+              class="btn"
+              :class="{'btn--red': delta < 0, 'btn--green': delta > 0}"
+          >
             <template v-if="delta > 0">+</template>
             {{ delta }}
           </button>
