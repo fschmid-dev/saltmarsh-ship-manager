@@ -6,7 +6,7 @@ import {onBeforeRouteUpdate} from "vue-router";
 import router from "@/router/index.js";
 import EasyMDE from "easymde";
 import 'easymde/dist/easymde.min.css';
-import snarkdown from "snarkdown";
+import ShipDisplay from "@/components/ShipDisplay.vue";
 
 const shipStore = useShipStore();
 const {getShipById} = storeToRefs(shipStore);
@@ -21,6 +21,21 @@ const editShip = ref(null);
 watch(shipId, () => {
   edit.value = false;
 });
+
+function downloadShip() {
+  console.log(ship.value);
+  // Code to download ship.value
+
+  const blob = new Blob([JSON.stringify(ship.value, null, 2)], {type: 'application/json '});
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${ship.value.name}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
 function startEdit() {
   editShip.value = JSON.parse(JSON.stringify(ship.value));
@@ -152,7 +167,33 @@ function addNewStat(module) {
   module.otherStats.push({
     name: 'Speed (water)',
     text: '20 ft.'
-  })
+  });
+}
+
+function moveStatUp(module, index) {
+  moveStat(module, index, -1)
+}
+
+function moveStatDown(module, index) {
+  moveStat(module, index, 1)
+}
+
+function moveStat(module, index, dir) {
+  const otherIndex = index + dir;
+  module.otherStats.splice(
+      otherIndex,
+      0,
+      module.otherStats.splice(index, 1)[0]
+  );
+}
+
+function removeStat(module, index) {
+  const deleteStat = confirm('Stat löschen?');
+  if (!deleteStat) {
+    return;
+  }
+
+  module.otherStats.splice(index, 1);
 }
 
 onBeforeRouteUpdate(async (to, from) => {
@@ -162,91 +203,39 @@ onBeforeRouteUpdate(async (to, from) => {
 
 <template>
   <div v-if="ship">
-    <div class="headline mb-3">
-      <h2>{{ ship.name }}</h2>
-      <div>
-        <div v-if="edit">
-          <button class="btn btn--red" title="löschen" @click.prevent="deleteShip">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M4 7l16 0"/>
-              <path d="M10 11l0 6"/>
-              <path d="M14 11l0 6"/>
-              <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-              <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-            </svg>
-          </button>
-          <button class="btn btn--green" title="speichern" @click.prevent="saveShip">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"/>
-              <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-              <path d="M14 4l0 4l-6 0l0 -4"/>
-            </svg>
-          </button>
-          <button class="btn" title="abbrechen" @click.prevent="cancelEdit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="icon icon-tabler icons-tabler-outline icon-tabler-cancel">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-              <path d="M18.364 5.636l-12.728 12.728"/>
-            </svg>
-          </button>
-        </div>
-        <div v-else>
-          <button class="btn" @click.prevent="startEdit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
-              <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
-              <path d="M16 5l3 3"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-    <template v-if="!edit">
-      <div v-for="(module, index) in ship.modules" :key="module" class="mb-3">
-        <h3 class="headline">
-          {{ module.name }}
-        </h3>
-        <div class="d-flex flex-column">
-          <div>
-            <b>Armor Class:</b> {{ module.armorClass }}
-          </div>
-          <div>
-            <b>Hit Points:</b> {{ module.hitPoints }}
-            <span v-if="module.damageThreshold">
-              <small>(damage threshold {{ module.damageThreshold }})</small>
-            </span>
-            /
-            <input type="number" inputmode="numeric" v-model="module.currentHitPoints">
-            <div>
-              <button
-                  v-for="delta in [-10, -5, -1, 1, 5, 10]" :key="'module_' + index + '_chp_' + delta"
-                  @click="module.currentHitPoints += delta">
-                <template v-if="delta > 0">+</template>
-                {{ delta }}
-              </button>
-            </div>
-          </div>
-          <div v-for="stat in module.otherStats">
-            <b>{{ stat.name }}</b>
-            <span>{{ stat.text }}</span>
-          </div>
-          <div v-if="module.description" v-html="snarkdown(module.description)" class="mt-2"></div>
-        </div>
-      </div>
-    </template>
+    <ShipDisplay :ship="ship" v-if="!edit">
+      <template v-slot:pre-name>
+        <button class="btn" title="herunterladen" @click="downloadShip">
+          <i class="fas fa-download fa-fw"></i>
+        </button>
+      </template>
+
+      <template v-slot:right-buttons>
+        <button class="btn" @click.prevent="startEdit">
+          <i class="fas fa-edit fa-fw fa-lg"></i>
+        </button>
+      </template>
+    </ShipDisplay>
 
     <template v-if="edit">
+      <div class="headline mb-3">
+        <div class="d-flex gap-3 align-items-center">
+          <span>Bearbeiten:</span>
+          <h2>{{ ship.name }}</h2>
+        </div>
+
+        <div>
+          <button class="btn btn--red" title="löschen" @click.prevent="deleteShip">
+            <i class="fas fa-trash fa-fw fa-lg"></i>
+          </button>
+          <button class="btn btn--green" title="speichern" @click.prevent="saveShip">
+            <i class="fas fa-save fa-fw fa-lg"></i>
+          </button>
+          <button class="btn" title="abbrechen" @click.prevent="cancelEdit">
+            <i class="fas fa-cancel fa-fw fa-lg"></i>
+          </button>
+        </div>
+      </div>
       <div class="d-flex flex-column gap-3">
         <div>
           <b>Name:</b> <input type="text" v-model="editShip.name">
@@ -260,44 +249,15 @@ onBeforeRouteUpdate(async (to, from) => {
               <button class="btn" title="Nach oben" v-if="index > 0"
                       @click.prevent="moveModuleUp(index)"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-move-up"
-                     style="height: 1rem;"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M12 13v-10"/>
-                  <path d="M9 6l3 -3l3 3"/>
-                  <path d="M12 17a2 2 0 1 1 0 4a2 2 0 0 1 0 -4z"/>
-                </svg>
+                <i class="fas fa-angles-up fa-fw"></i>
               </button>
               <button class="btn" title="Nach unten" v-if="index < (editShip.modules.length - 1)"
                       @click.prevent="moveModuleDown(index)"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-move-down"
-                     style="height: 1rem;"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M12 11v10"/>
-                  <path d="M9 18l3 3l3 -3"/>
-                  <path d="M12 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                </svg>
+                <i class="fas fa-angles-down fa-fw"></i>
               </button>
               <button class="btn btn--red" title="entfernen" @click.prevent="removeModule(index)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="icon icon-tabler icons-tabler-outline icon-tabler-trash"
-                     style="height: 1rem;"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M4 7l16 0"/>
-                  <path d="M10 11l0 6"/>
-                  <path d="M14 11l0 6"/>
-                  <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
-                  <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
-                </svg>
+                <i class="fas fa-trash fa-fw"></i>
               </button>
             </div>
           </div>
@@ -319,9 +279,23 @@ onBeforeRouteUpdate(async (to, from) => {
           </div>
           <div>
             <b>Weitere Stats:</b>
-            <div v-for="(stat, statIndex) in module.otherStats">
-              <input type="text" v-model="stat.name">
-              <input type="text" v-model="stat.text">
+            <div v-for="(stat, statIndex) in module.otherStats" class="d-flex align-items-center mb-3">
+              <div class="d-flex flex-column">
+                <input type="text" v-model="stat.name">
+                <textarea type="text" v-model="stat.text"/>
+              </div>
+              <div>
+                <button class="btn btn--red" @click="removeStat(module, statIndex)"
+                >
+                  <i class="fas fa-fw fa-trash"></i>
+                </button>
+                <button class="btn" @click="moveStatUp(module, statIndex)">
+                  <i class="fas fa-fw fa-angles-up"></i>
+                </button>
+                <button class="btn" @click="moveStatDown(module, statIndex)">
+                  <i class="fas fa-fw fa-angles-down"></i>
+                </button>
+              </div>
             </div>
             <button class="btn" @click.prevent="addNewStat(module)">
               Neuen Stat hinzufügen

@@ -1,11 +1,12 @@
 import './assets/main.css'
 
-import {createApp, toRaw} from 'vue'
+import {createApp} from 'vue'
 
 import App from './App.vue'
 import router from './router'
 import localforage from "localforage";
 import {createPinia} from 'pinia'
+import '@fortawesome/fontawesome-free/css/all.css';
 
 const app = createApp(App)
 

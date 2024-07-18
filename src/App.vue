@@ -74,6 +74,9 @@ watch(
         <a @click="createNewShip">
           Neues Schiff erstellen
         </a>
+        <a @click="router.push('/import')">
+          Schiff importieren
+        </a>
         <hr>
         <RouterLink :to="'/ship/' + ship.id" v-for="ship in shipStore.getShips()" :key="'ship_' + ship.id"
                     active-class="active"
