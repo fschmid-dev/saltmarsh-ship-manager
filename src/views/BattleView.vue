@@ -45,10 +45,10 @@ onMounted(() => {
 <template>
   <div class="battle-grid">
     <div class="battle-grid__left">
-      <select v-model="shipLeft">
+      <select v-model="shipLeftId" class="form-select">
         <option
             v-for="ship in shipStore.getShips()" :key="'ship-left_' + ship.id"
-            :value="ship"
+            :value="ship.id"
         >
           {{ ship.name }}
         </option>
@@ -62,10 +62,10 @@ onMounted(() => {
       </ShipDisplay>
     </div>
     <div class="battle-grid__right">
-      <select v-model="shipRight">
+      <select v-model="shipRightId" class="form-select">
         <option
             v-for="ship in shipStore.getShips()" :key="'ship-left_' + ship.id"
-            :value="ship"
+            :value="ship.id"
         >
           {{ ship.name }}
         </option>

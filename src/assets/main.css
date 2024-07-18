@@ -1,5 +1,23 @@
-@import './base.css';
+@import '_custom_bootstrap.scss';
+
 @import './font.css';
+
+:root, [data-bs-theme="dark"] {
+  --primary: #ca9b3b;
+  --primary-dark: #9c7931;
+  --bs-link-color: var(--primary);
+  --bs-link-hover-color: var(--primary-dark);
+  --background: #292929;
+  --text: white;
+}
+
+/* semantic color variables for this project */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
 
 #app {
   max-width: 1280px;
@@ -33,21 +51,6 @@ a:hover {
   gap: 2rem;
 }
 
-.d-flex {
-  display: flex;
-}
-.flex-column {
-  flex-direction: column;
-}
-.gap-3 {
-  gap: 1rem;
-}
-.align-items-center {
-  align-items: center;
-}
-.justify-space-between {
-  justify-content: space-between;
-}
 .headline {
   color: var(--primary);
   display: flex;
@@ -55,40 +58,4 @@ a:hover {
   justify-content: space-between;
   border-bottom: 2px solid var(--primary);
   font-family: 'Baskervville SC', serif;
-}
-
-.btn {
-  --background-color: transparent;
-  --color: var(--primary);
-  --hover-background-color: var(--primary);
-  --hover-color: white;
-
-  display: inline-block;
-  box-sizing: border-box;
-  text-decoration: none;
-  color: var(--color);
-  transition: 0.3s;
-  padding: .5rem;
-  transition-property: background-color, color;
-  background-color: var(--background-color);
-  border: none;
-  cursor: pointer;
-}
-.btn--green {
-  --color: green;
-  --hover-background-color: green;
-}
-.btn--red {
-  --color: red;
-  --hover-background-color: red;
-}
-.btn:hover {
-  background-color: var(--hover-background-color);
-  color: var(--hover-color)!important;
-}
-.mb-3 {
-  margin-bottom: 1rem;
-}
-.mt-2 {
-  margin-top: .5rem;
 }

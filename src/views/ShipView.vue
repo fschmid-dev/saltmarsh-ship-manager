@@ -205,13 +205,13 @@ onBeforeRouteUpdate(async (to, from) => {
   <div v-if="ship">
     <ShipDisplay :ship="ship" v-if="!edit">
       <template v-slot:pre-name>
-        <button class="btn" title="herunterladen" @click="downloadShip">
+        <button class="btn btn-link" title="herunterladen" @click="downloadShip">
           <i class="fas fa-download fa-fw"></i>
         </button>
       </template>
 
       <template v-slot:right-buttons>
-        <button class="btn" @click.prevent="startEdit">
+        <button class="btn btn-link" @click.prevent="startEdit">
           <i class="fas fa-edit fa-fw fa-lg"></i>
         </button>
       </template>
@@ -224,84 +224,119 @@ onBeforeRouteUpdate(async (to, from) => {
           <h2>{{ ship.name }}</h2>
         </div>
 
-        <div>
-          <button class="btn btn--red" title="löschen" @click.prevent="deleteShip">
+        <div class="btn-group btn-group-sm">
+          <button class="btn btn-outline-danger" title="löschen" @click.prevent="deleteShip">
             <i class="fas fa-trash fa-fw fa-lg"></i>
           </button>
-          <button class="btn btn--green" title="speichern" @click.prevent="saveShip">
+          <button class="btn btn-outline-success" title="speichern" @click.prevent="saveShip">
             <i class="fas fa-save fa-fw fa-lg"></i>
           </button>
-          <button class="btn" title="abbrechen" @click.prevent="cancelEdit">
+          <button class="btn btn-outline-primary" title="abbrechen" @click.prevent="cancelEdit">
             <i class="fas fa-cancel fa-fw fa-lg"></i>
           </button>
         </div>
       </div>
       <div class="d-flex flex-column gap-3">
-        <div>
-          <b>Name:</b> <input type="text" v-model="editShip.name">
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <label for="ship_name">Name:</label>
+          </div>
+          <div class="col-auto">
+            <input type="text" v-model="editShip.name" class="form-control">
+          </div>
         </div>
 
-        <div v-for="(module, index) in editShip.modules" :key="'module_' + index" :data-index="index">
+        <div v-for="(module, index) in editShip.modules" :key="'module_' + index" :data-index="index"
+             class="d-flex flex-column gap-2">
           <div class="headline">
             <h4>Modul: {{ module.name }}</h4>
 
             <div>
-              <button class="btn" title="Nach oben" v-if="index > 0"
+              <button class="btn btn-link" title="Nach oben" v-if="index > 0"
                       @click.prevent="moveModuleUp(index)"
               >
                 <i class="fas fa-angles-up fa-fw"></i>
               </button>
-              <button class="btn" title="Nach unten" v-if="index < (editShip.modules.length - 1)"
+              <button class="btn btn-link" title="Nach unten" v-if="index < (editShip.modules.length - 1)"
                       @click.prevent="moveModuleDown(index)"
               >
                 <i class="fas fa-angles-down fa-fw"></i>
               </button>
-              <button class="btn btn--red" title="entfernen" @click.prevent="removeModule(index)">
+              <button class="btn btn-outline-danger" title="entfernen" @click.prevent="removeModule(index)">
                 <i class="fas fa-trash fa-fw"></i>
               </button>
             </div>
           </div>
-          <div>
-            <b>Name:</b>
-            <input type="text" v-model="module.name">
-          </div>
-          <div>
-            <b>Armor Class:</b>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.armorClass">
-          </div>
-          <div>
-            <b>Hit Points</b>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.hitPoints">
-          </div>
-          <div>
-            <b>Current Hit Points</b>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.currentHitPoints">
-          </div>
-          <div>
-            <b>Weitere Stats:</b>
-            <div v-for="(stat, statIndex) in module.otherStats" class="d-flex align-items-center mb-3">
-              <div class="d-flex flex-column">
-                <input type="text" v-model="stat.name">
-                <textarea type="text" v-model="stat.text"/>
-              </div>
-              <div>
-                <button class="btn btn--red" @click="removeStat(module, statIndex)"
-                >
-                  <i class="fas fa-fw fa-trash"></i>
-                </button>
-                <button class="btn" @click="moveStatUp(module, statIndex)">
-                  <i class="fas fa-fw fa-angles-up"></i>
-                </button>
-                <button class="btn" @click="moveStatDown(module, statIndex)">
-                  <i class="fas fa-fw fa-angles-down"></i>
-                </button>
-              </div>
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
+              <label :for="'module_' + index + '_name'" class="font-bold"><b>Name:</b></label>
             </div>
-            <button class="btn" @click.prevent="addNewStat(module)">
-              Neuen Stat hinzufügen
-            </button>
+            <div class="col-auto">
+              <input type="text" v-model="module.name" class="form-control" :id="'module_' + index + '_name'">
+            </div>
+          </div>
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
+              <label :for="'module_' + index + '_ac'"><b>Armor Class:</b></label>
+            </div>
+            <div class="col-auto">
+              <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.armorClass" class="form-control"
+                     :id="'module_' + index + '_ac'">
+            </div>
+          </div>
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
+              <label :for="'module_' + index + '_hp'"><b>Hit Points:</b></label>
+            </div>
+            <div class="col-auto">
+              <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.hitPoints" class="form-control"
+                     :id="'module_' + index + '_hp'">
+            </div>
+          </div>
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
+              <label :for="'module_' + index + ' _chp'"><b>Current Hit Points:</b></label>
+            </div>
+            <div class="col-auto">
+              <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.currentHitPoints"
+                     class="form-control" :id="'module_' + index + '_chp'">
+            </div>
           </div>
           <div>
+            <div class="mb-3">
+              <b>Weitere Stats:</b>
+            </div>
+            <div class="list-group list-group-flush">
+              <div v-for="(stat, statIndex) in module.otherStats"
+                   class="d-flex flex-row align-items-center gap-3 list-group-item px-0">
+                <div class="d-flex flex-column flex-grow-1">
+                  <input type="text" v-model="stat.name" class="form-control" placeholder="Speed (water)">
+                  <textarea type="text" v-model="stat.text" class="form-control" placeholder="20 ft."/>
+                </div>
+                <div>
+                  <button class="btn btn-link" @click="moveStatUp(module, statIndex)" title="Nach oben verschieben"
+                          :disabled="statIndex === 0"
+                  >
+                    <i class="fas fa-fw fa-angles-up"></i>
+                  </button>
+                  <button class="btn btn-link" @click="moveStatDown(module, statIndex)" title="Nach unten verschieben"
+                          :disabled="statIndex === (module.otherStats.length - 1)"
+                  >
+                    <i class="fas fa-fw fa-angles-down"></i>
+                  </button>
+                  <button class="btn btn-outline-danger" @click="removeStat(module, statIndex)"
+                  >
+                    <i class="fas fa-fw fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <button class="list-group-item list-group-item-action list-group-item-primary" @click.prevent="addNewStat(module)">
+                Neuen Stat hinzufügen
+              </button>
+            </div>
+          </div>
+          <div class="mt-3">
+            <b>Beschreibung:</b>
             <textarea class="textarea-mde" v-model="module.description"></textarea>
           </div>
         </div>
@@ -320,3 +355,12 @@ onBeforeRouteUpdate(async (to, from) => {
     </b>
   </div>
 </template>
+
+<style>
+.editor-toolbar {
+  background-color: var(--bs-black);
+}
+.CodeMirror {
+  background-color: var(--bs-light);
+}
+</style>

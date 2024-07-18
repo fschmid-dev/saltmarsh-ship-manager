@@ -1,6 +1,9 @@
 /* color palette from <https://github.com/vuejs/theme> */
-:root {
+:root, [data-bs-theme="dark"] {
   --primary: #ca9b3b;
+  --primary-dark: #9c7931;
+  --bs-link-color: var(--primary);
+  --bs-link-hover-color: var(--primary-dark);
   --background: #292929;
   --text: white;
 }

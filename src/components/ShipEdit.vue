@@ -35,7 +35,7 @@ defineProps({
           >
             <i class="fas fa-angles-down fa-fw"></i>
           </button>
-          <button class="btn btn--red" title="entfernen" @click.prevent="removeModule(index)">
+          <button class="btn btn-danger" title="entfernen" @click.prevent="removeModule(index)">
             <i class="fas fa-trash fa-fw"></i>
           </button>
         </div>
@@ -64,7 +64,7 @@ defineProps({
             <textarea type="text" v-model="stat.text"/>
           </div>
           <div>
-            <button class="btn btn--red" @click="removeStat(module, statIndex)"
+            <button class="btn btn-danger" @click="removeStat(module, statIndex)"
             >
               <i class="fas fa-fw fa-trash"></i>
             </button>

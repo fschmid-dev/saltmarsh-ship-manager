@@ -13,7 +13,7 @@ provide('shipId', shipId);
 function createNewShip() {
   let shipName = prompt('Name des Schiffs', 'Neues Schiff');
   if (!shipName) {
-    shipName = 'Neues Schiff!';
+    return;
   }
 
   const ship = {
@@ -58,11 +58,11 @@ watch(
 
 <template>
   <header>
-    <div class="d-flex align-items-center justify-space-between">
+    <div class="d-flex align-items-center justify-content-between">
       <h1 style="cursor: pointer" @click="router.push('/')">
         Saltmarsh Ship Editor
       </h1>
-      <RouterLink to="/battle" class="btn">
+      <RouterLink to="/battle" class="btn btn-primary">
         <i class="fas fa-crosshairs fa-fw"></i>
         Battle!
       </RouterLink>
@@ -71,22 +71,24 @@ watch(
 
   <main id="main">
     <div id="sidebar">
-      <div class="list">
+      <div class="d-flex flex-column text-start">
         <div>
-          <b>Schiffe:</b>
+          <b><i class="fas fa-ship fa-fw me-2"></i>Schiffe:</b>
         </div>
-        <a @click="createNewShip">
+        <a @click="createNewShip" class="btn btn-link">
           Neues Schiff erstellen
         </a>
-        <a @click="router.push('/import')">
+        <a @click="router.push('/import')" class="btn btn-link">
           Schiff importieren
         </a>
         <hr>
-        <RouterLink :to="'/ship/' + ship.id" v-for="ship in shipStore.getShips()" :key="'ship_' + ship.id"
-                    active-class="active"
-        >
-          {{ ship.name }}
-        </RouterLink>
+        <div class="d-flex flex-column gap-2">
+          <RouterLink :to="'/ship/' + ship.id" v-for="ship in shipStore.getShips()" :key="'ship_' + ship.id"
+                      active-class="bg-primary text-white" class="btn btn-link text-start"
+          >
+            {{ ship.name }}
+          </RouterLink>
+        </div>
       </div>
     </div>
     <div id="content">
@@ -96,12 +98,6 @@ watch(
 </template>
 
 <style scoped>
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
-}
-
 .router-link-active {
   font-weight: bold;
 }
