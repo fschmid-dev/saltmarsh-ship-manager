@@ -4,8 +4,6 @@ import {useShipStore} from "@/stores/ship.js";
 import router from "@/router/index.js";
 import {onMounted, provide, ref, watch} from "vue";
 
-import localforage from "localforage";
-
 const route = useRoute();
 
 const shipStore = useShipStore();
@@ -60,9 +58,15 @@ watch(
 
 <template>
   <header>
-    <h1 style="cursor: pointer" @click="router.push('/')">
-      Saltmarsh Ship Editor
-    </h1>
+    <div class="d-flex align-items-center justify-space-between">
+      <h1 style="cursor: pointer" @click="router.push('/')">
+        Saltmarsh Ship Editor
+      </h1>
+      <RouterLink to="/battle" class="btn">
+        <i class="fas fa-crosshairs fa-fw"></i>
+        Battle!
+      </RouterLink>
+    </div>
   </header>
 
   <main id="main">
