@@ -45,7 +45,7 @@ async function saveShip() {
   </div>
 
   <div class="mb-3">
-    <input type="file" @change="importShip"/><br>
+    <input type="file" @change="importShip" class="form-control"/><br>
   </div>
 
   <div v-if="error" style="color: red">
@@ -53,9 +53,18 @@ async function saveShip() {
   </div>
 
   <div v-if="ship">
+    <p>
+      Schiff <b class="color-primary font-baskervville-sc">{{ ship.name }}</b> konnte erfolgreich geladen werden.<br>
+      Zum Importieren noch folgenden Button drücken, anschließend kann das Schiff bearbeitet werden:<br>
+      <button class="btn btn-success" @click="saveShip">
+        <i class="fas fa-save fa-fw me-2"></i>Speichern
+      </button>
+    </p>
+
+
     <ShipDisplay :ship="ship">
       <template v-slot:right-buttons>
-        <button class="btn btn--green" @click="saveShip">
+        <button class="btn btn-success" @click="saveShip">
           <i class="fas fa-fw fa-save fa-xl"></i>
         </button>
       </template>

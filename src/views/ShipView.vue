@@ -100,6 +100,15 @@ function deleteShip() {
   router.push('/');
 }
 
+async function copyShip() {
+  const shipToCopy = JSON.parse(JSON.stringify(ship.value));
+  shipToCopy.id = Date.now();
+  shipToCopy.name += ' (Kopie)';
+
+  await shipStore.addShip(shipToCopy);
+  router.push('/ship/' + shipToCopy.id);
+}
+
 async function saveShip() {
   const shipToSave = JSON.parse(JSON.stringify(editShip.value));
 
@@ -211,9 +220,14 @@ onBeforeRouteUpdate(async (to, from) => {
       </template>
 
       <template v-slot:right-buttons>
-        <button class="btn btn-link" @click.prevent="startEdit">
-          <i class="fas fa-edit fa-fw fa-lg"></i>
-        </button>
+        <div class="button-group">
+          <button class="btn btn-link" @click="copyShip" title="kopieren">
+            <i class="fas fa-copy fa-fw fa-lg"></i>
+          </button>
+          <button class="btn btn-link" @click.prevent="startEdit">
+            <i class="fas fa-edit fa-fw fa-lg"></i>
+          </button>
+        </div>
       </template>
     </ShipDisplay>
 
@@ -330,7 +344,8 @@ onBeforeRouteUpdate(async (to, from) => {
                   </button>
                 </div>
               </div>
-              <button class="list-group-item list-group-item-action list-group-item-primary" @click.prevent="addNewStat(module)">
+              <button class="list-group-item list-group-item-action list-group-item-primary"
+                      @click.prevent="addNewStat(module)">
                 Neuen Stat hinzufügen
               </button>
             </div>
@@ -360,6 +375,7 @@ onBeforeRouteUpdate(async (to, from) => {
 .editor-toolbar {
   background-color: var(--bs-black);
 }
+
 .CodeMirror {
   background-color: var(--bs-light);
 }

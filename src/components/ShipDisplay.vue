@@ -16,7 +16,7 @@ function changeHitPoints(module, delta = null) {
 
 <template>
   <div class="headline mb-3">
-    <div class="d-flex gap-3 align-items-center">
+    <div class="d-flex align-items-center">
       <slot name="pre-name"></slot>
       <h2>{{ ship.name }}</h2>
     </div>
@@ -30,24 +30,27 @@ function changeHitPoints(module, delta = null) {
   <div v-for="(module, index) in ship.modules" :key="module" class="mb-3"
        :class="{ 'bg-danger-subtle': module.currentHitPoints <= 0 }"
   >
-    <h3 class="headline">
-      {{ module.name }}
-      <small v-if="module.currentHitPoints <= 0">
+    <div class="headline">
+      <div class="d-flex flex-row align-items-center">
+        <i class="fas fa-skull-crossbones fa-fw me-2"></i>
+        <h3>{{ module.name }}</h3>
+      </div>
+      <span v-if="module.currentHitPoints <= 0">
         (beschädigt/zerstört)
-      </small>
-    </h3>
+      </span>
+    </div>
     <div class="d-flex flex-column gap-1">
       <div>
         <b>Armor Class:</b> {{ module.armorClass }}
       </div>
-      <div class="row g-3 align-items-center">
-        <div class="col-auto">
+      <div class="row g-3 align-items-center mt-0">
+        <div class="col-auto mt-0">
           <b class="me-2">Hit Points:</b>{{ module.hitPoints }}
           <span v-if="module.damageThreshold">
               <small>(damage threshold {{ module.damageThreshold }})</small>
             </span>
         </div>
-        <div class="col-auto d-flex flex-row gap-3">
+        <div class="col-auto d-flex flex-row gap-3 mt-0">
           <span>/</span>
           <input type="number" inputmode="numeric" v-model="module.currentHitPoints" @change="changeHitPoints(module)"
                  class="form-control form-control-sm form-control-plaintext"

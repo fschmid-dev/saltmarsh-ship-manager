@@ -2,11 +2,19 @@
 import {RouterView, useRoute} from 'vue-router';
 import {useShipStore} from "@/stores/ship.js";
 import router from "@/router/index.js";
-import {onMounted, provide, ref, watch} from "vue";
+import {computed, onMounted, provide, ref, watch} from "vue";
+import {storeToRefs} from "pinia";
 
 const route = useRoute();
 
 const shipStore = useShipStore();
+const { getShips } = storeToRefs(shipStore);
+const shipList = computed(() => {
+  const shipList = Object.values(getShips.value());
+  return shipList.sort((a, b) => {
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+  });
+});
 const shipId = ref(null);
 provide('shipId', shipId);
 
@@ -83,7 +91,7 @@ watch(
         </a>
         <hr>
         <div class="d-flex flex-column gap-2">
-          <RouterLink :to="'/ship/' + ship.id" v-for="ship in shipStore.getShips()" :key="'ship_' + ship.id"
+          <RouterLink :to="'/ship/' + ship.id" v-for="ship in shipList" :key="'ship_' + ship.id"
                       active-class="bg-primary text-white" class="btn btn-link text-start"
           >
             {{ ship.name }}

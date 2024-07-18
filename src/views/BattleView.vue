@@ -8,6 +8,13 @@ import {storeToRefs} from "pinia";
 const router = useRouter();
 
 const shipStore = useShipStore();
+const { getShips } = storeToRefs(shipStore);
+const shipList = computed(() => {
+  const shipList = Object.values(getShips.value());
+  return shipList.sort((a, b) => {
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+  });
+});
 const {getShipById} = storeToRefs(shipStore);
 
 const shipLeftId = ref(null);
@@ -47,7 +54,7 @@ onMounted(() => {
     <div class="battle-grid__left">
       <select v-model="shipLeftId" class="form-select">
         <option
-            v-for="ship in shipStore.getShips()" :key="'ship-left_' + ship.id"
+            v-for="ship in shipList" :key="'ship-left_' + ship.id"
             :value="ship.id"
         >
           {{ ship.name }}
@@ -55,7 +62,7 @@ onMounted(() => {
       </select>
       <ShipDisplay v-if="shipLeft" :ship="shipLeft">
         <template v-slot:right-buttons>
-          <RouterLink :to="'/ship/' + shipLeft.id" class="btn">
+          <RouterLink :to="'/ship/' + shipLeft.id" class="btn btn-link">
             <i class="fas fa-fw fa-edit"></i>
           </RouterLink>
         </template>
@@ -64,7 +71,7 @@ onMounted(() => {
     <div class="battle-grid__right">
       <select v-model="shipRightId" class="form-select">
         <option
-            v-for="ship in shipStore.getShips()" :key="'ship-left_' + ship.id"
+            v-for="ship in shipList" :key="'ship-left_' + ship.id"
             :value="ship.id"
         >
           {{ ship.name }}
@@ -72,7 +79,7 @@ onMounted(() => {
       </select>
       <ShipDisplay v-if="shipRight" :ship="shipRight">
         <template v-slot:right-buttons>
-          <RouterLink :to="'/ship/' + shipRight.id" class="btn">
+          <RouterLink :to="'/ship/' + shipRight.id" class="btn btn-link">
             <i class="fas fa-fw fa-edit"></i>
           </RouterLink>
         </template>
