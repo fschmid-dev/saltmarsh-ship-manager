@@ -4,6 +4,9 @@ import {computed, inject, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {onBeforeRouteUpdate} from "vue-router";
 import router from "@/router/index.js";
+import EasyMDE from "easymde";
+import 'easymde/dist/easymde.min.css';
+import snarkdown from "snarkdown";
 
 const shipStore = useShipStore();
 const {getShipById} = storeToRefs(shipStore);
@@ -21,9 +24,49 @@ watch(shipId, () => {
 
 function startEdit() {
   editShip.value = JSON.parse(JSON.stringify(ship.value));
+  edit.value = true;
 
   requestAnimationFrame(() => {
-    edit.value = true;
+    initMde();
+  });
+}
+
+function initMde() {
+  const mdeTextAreas = document.querySelectorAll('.textarea-mde');
+  for (let i = 0; i < mdeTextAreas.length; i++) {
+    const textArea = mdeTextAreas[i];
+    const easyMDE = new EasyMDE({
+      element: textArea,
+      minHeight: 'fit-content',
+    });
+    textArea.mde = easyMDE;
+    easyMDE.codemirror.on('change', (e) => {
+      editShip.value.modules[i].description = easyMDE.value();
+    })
+  }
+}
+
+function removeMde() {
+  const mdeTextAreas = document.querySelectorAll('.textarea-mde');
+  for (let i = 0; i < mdeTextAreas.length; i++) {
+    const textArea = mdeTextAreas[i];
+    if (textArea.mde) {
+      textArea.mde.toTextArea();
+    }
+  }
+}
+
+function reInitMde(callbackBetween = null) {
+  removeMde();
+
+  if (callbackBetween !== null && typeof callbackBetween === 'function') {
+    requestAnimationFrame(() => {
+      callbackBetween();
+    })
+  }
+
+  requestAnimationFrame(() => {
+    initMde();
   });
 }
 
@@ -68,14 +111,16 @@ function moveModuleDown(index) {
 }
 
 function moveModule(index, dir) {
-  const modules = JSON.parse(JSON.stringify(editShip.value.modules));
-  const otherIndex = index + dir;
-  modules.splice(
-      otherIndex,
-      0,
-      modules.splice(index, 1)[0]
-  );
-  editShip.value.modules = modules;
+  reInitMde(() => {
+    const modules = JSON.parse(JSON.stringify(editShip.value.modules));
+    const otherIndex = index + dir;
+    modules.splice(
+        otherIndex,
+        0,
+        modules.splice(index, 1)[0]
+    );
+    editShip.value.modules = modules;
+  });
 }
 
 function addNewModule() {
@@ -86,11 +131,28 @@ function addNewModule() {
     currentHitPoints: 100,
     otherStats: [],
     description: 'Neues Modul'
-  })
+  });
+
+  reInitMde();
 }
 
 function removeModule(index) {
+  const deleteModule = confirm('Module löschen?');
+  if (!deleteModule) {
+    return;
+  }
+
+
   editShip.value.modules.splice(index, 1);
+}
+
+function addNewStat(module) {
+  console.log(module);
+
+  module.otherStats.push({
+    name: 'Speed (water)',
+    text: '20 ft.'
+  })
 }
 
 onBeforeRouteUpdate(async (to, from) => {
@@ -151,7 +213,7 @@ onBeforeRouteUpdate(async (to, from) => {
       </div>
     </div>
     <template v-if="!edit">
-      <div v-for="module in ship.modules" :key="module" class="mb-3">
+      <div v-for="(module, index) in ship.modules" :key="module" class="mb-3">
         <h3 class="headline">
           {{ module.name }}
         </h3>
@@ -162,12 +224,24 @@ onBeforeRouteUpdate(async (to, from) => {
           <div>
             <b>Hit Points:</b> {{ module.hitPoints }}
             <span v-if="module.damageThreshold">
-            <small>(damage threshold {{ module.damageThreshold }})</small>
-          </span>
+              <small>(damage threshold {{ module.damageThreshold }})</small>
+            </span>
+            /
+            <input type="number" inputmode="numeric" v-model="module.currentHitPoints">
+            <div>
+              <button
+                  v-for="delta in [-10, -5, -1, 1, 5, 10]" :key="'module_' + index + '_chp_' + delta"
+                  @click="module.currentHitPoints += delta">
+                <template v-if="delta > 0">+</template>
+                {{ delta }}
+              </button>
+            </div>
           </div>
-          <div v-if="module.description">
-            {{ module.description }}
+          <div v-for="stat in module.otherStats">
+            <b>{{ stat.name }}</b>
+            <span>{{ stat.text }}</span>
           </div>
+          <div v-if="module.description" v-html="snarkdown(module.description)" class="mt-2"></div>
         </div>
       </div>
     </template>
@@ -242,6 +316,19 @@ onBeforeRouteUpdate(async (to, from) => {
           <div>
             <b>Current Hit Points</b>
             <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.currentHitPoints">
+          </div>
+          <div>
+            <b>Weitere Stats:</b>
+            <div v-for="(stat, statIndex) in module.otherStats">
+              <input type="text" v-model="stat.name">
+              <input type="text" v-model="stat.text">
+            </div>
+            <button class="btn" @click.prevent="addNewStat(module)">
+              Neuen Stat hinzufügen
+            </button>
+          </div>
+          <div>
+            <textarea class="textarea-mde" v-model="module.description"></textarea>
           </div>
         </div>
 
