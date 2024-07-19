@@ -53,6 +53,7 @@ function initMde() {
     const easyMDE = new EasyMDE({
       element: textArea,
       minHeight: 'fit-content',
+      spellChecker: false,
     });
     textArea.mde = easyMDE;
     easyMDE.codemirror.on('change', (e) => {
@@ -309,6 +310,15 @@ onBeforeRouteUpdate(async (to, from) => {
           </div>
           <div class="row g-3 align-items-center">
             <div class="col-auto">
+              <label :for="'module_' + index + '_threshold'"><b>Damages threshold:</b></label>
+            </div>
+            <div class="col-auto">
+              <input type="number" inputmode="numeric" pattern="[0-9]*" v-model="module.damageThreshold" class="form-control"
+                     :id="'module_' + index + '_threshold'">
+            </div>
+          </div>
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
               <label :for="'module_' + index + ' _chp'"><b>Current Hit Points:</b></label>
             </div>
             <div class="col-auto">
@@ -374,6 +384,11 @@ onBeforeRouteUpdate(async (to, from) => {
 <style>
 .editor-toolbar {
   background-color: var(--bs-black);
+}
+
+.editor-toolbar button.active,
+.editor-toolbar button:hover {
+  color: var(--bs-black);
 }
 
 .CodeMirror {

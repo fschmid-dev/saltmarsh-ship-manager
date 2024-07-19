@@ -32,7 +32,6 @@ function changeHitPoints(module, delta = null) {
   >
     <div class="headline">
       <div class="d-flex flex-row align-items-center">
-        <i class="fas fa-skull-crossbones fa-fw me-2"></i>
         <h3>{{ module.name }}</h3>
       </div>
       <span v-if="module.currentHitPoints <= 0">
@@ -44,14 +43,14 @@ function changeHitPoints(module, delta = null) {
         <b>Armor Class:</b> {{ module.armorClass }}
       </div>
       <div class="row g-3 align-items-center mt-0">
-        <div class="col-auto mt-0">
+        <div class="col-auto mt-0 py-1">
           <b class="me-2">Hit Points:</b>{{ module.hitPoints }}
           <span v-if="module.damageThreshold">
               <small>(damage threshold {{ module.damageThreshold }})</small>
             </span>
         </div>
         <div class="col-auto d-flex flex-row gap-3 mt-0">
-          <span>/</span>
+          <span class="ms-2 py-1">/</span>
           <input type="number" inputmode="numeric" v-model="module.currentHitPoints" @change="changeHitPoints(module)"
                  class="form-control form-control-sm form-control-plaintext"
           >
